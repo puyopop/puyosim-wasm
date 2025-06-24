@@ -1,0 +1,42 @@
+{
+  "fmt": {
+    "semiColons": true,
+    "singleQuote": true,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "include": [
+      "src/",
+      "**/*.js",
+      "**/*.ts"
+    ],
+    "exclude": [
+      "node_modules/",
+      "target/",
+      ".git/",
+      "doc/",
+      "*.md"
+    ]
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    },
+    "include": [
+      "src/",
+      "**/*.js",
+      "**/*.ts"
+    ],
+    "exclude": [
+      "node_modules/",
+      "target/",
+      ".git/",
+      "doc/"
+    ]
+  },
+  "test": {
+    "include": [
+      "src/",
+      "**/*.test.{js,ts}"
+    ]
+  }
+}

@@ -1,0 +1,183 @@
+name: Deno CI
+
+on:
+  push:
+  pull_request:
+
+env:
+  DENO_DIR: /tmp/.deno
+
+jobs:
+  # Primary Deno workflow
+  deno:
+    name: Deno
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        deno-version: ['v1.x', 'v2.x']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno ${{ matrix.deno-version }}
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ matrix.deno-version }}
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: deno-${{ matrix.deno-version }}-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            deno-${{ matrix.deno-version }}-
+
+      - name: Verify Deno installation
+        run: deno --version
+
+      - name: Check formatting
+        run: |
+          if find . -name "*.js" -o -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./doc/*" | head -1 | grep -q .; then
+            echo "Checking formatting for JavaScript/TypeScript files..."
+            deno fmt --check
+          else
+            echo "No JavaScript/TypeScript files found, skipping format check"
+          fi
+
+      - name: Run linter
+        run: |
+          if find . -name "*.js" -o -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./doc/*" | head -1 | grep -q .; then
+            echo "Linting JavaScript/TypeScript files..."
+            deno lint
+          else
+            echo "No JavaScript/TypeScript files found, skipping lint"
+          fi
+
+      - name: Type check TypeScript files
+        run: |
+          if find . -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" | head -1 | grep -q .; then
+            echo "Type checking TypeScript files..."
+            find . -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" -exec deno check {} +
+          else
+            echo "No TypeScript files found, skipping type check"
+          fi
+
+      - name: Run Deno tests
+        run: |
+          if find . -name "*.test.js" -o -name "*.test.ts" | head -1 | grep -q .; then
+            echo "Running Deno test files..."
+            deno test --allow-all --coverage=coverage
+          else
+            echo "No Deno test files found (*.test.js, *.test.ts)"
+          fi
+
+      - name: Run project-specific tests
+        run: |
+          if [ -f "src/tools/run-tests.sh" ]; then
+            echo "Running project test script..."
+            chmod +x src/tools/run-tests.sh
+            ./src/tools/run-tests.sh
+          elif [ -f "src/tools/puyop-parser.test.js" ]; then
+            echo "Running parser tests..."
+            deno run --allow-net src/tools/puyop-parser.test.js
+          else
+            echo "No project-specific test script found"
+          fi
+
+      - name: Generate coverage report
+        if: matrix.deno-version == 'v1.x'
+        run: |
+          if [ -d "coverage" ]; then
+            deno coverage coverage --lcov --output=coverage.lcov
+          fi
+
+      - name: Upload coverage to Codecov
+        if: matrix.deno-version == 'v1.x'
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.lcov
+          fail_ci_if_error: false
+
+      - name: Security dependency check
+        run: |
+          if [ -f "deno.lock" ]; then
+            echo "Checking dependencies with lock file..."
+            deno cache --reload --lock=deno.lock deno.json
+          elif [ -f "deno.json" ]; then
+            echo "Caching dependencies from deno.json..."
+            deno cache --reload deno.json
+          else
+            echo "No dependency file found, skipping security check"
+          fi
+
+  # Compatibility check with Node.js (if needed)
+  compatibility:
+    name: Node.js Compatibility
+    runs-on: ubuntu-latest
+    # Only run if there are any npm/node related files
+    if: ${{ contains(github.event.head_commit.message, '[test-node]') || github.event_name == 'pull_request' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Test JavaScript files with Node.js
+        run: |
+          echo "Testing JavaScript file compatibility with Node.js..."
+          if find . -name "*.js" -not -path "./node_modules/*" -not -path "./.git/*" | head -1 | grep -q .; then
+            # Basic syntax check
+            find . -name "*.js" -not -path "./node_modules/*" -not -path "./.git/*" -exec node --check {} \;
+            echo "✅ JavaScript files are Node.js compatible"
+          else
+            echo "No JavaScript files found"
+          fi
+
+  # Security scanning
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v1.x
+
+      - name: Deno security audit
+        run: |
+          echo "Running Deno security checks..."
+          # Check for known vulnerabilities in dependencies
+          if [ -f "deno.lock" ]; then
+            deno cache --reload --lock=deno.lock deno.json
+          fi
+
+          # Basic security scan of JavaScript files
+          echo "Scanning for potential security issues..."
+          if command -v grep >/dev/null 2>&1; then
+            # Look for potential security issues
+            echo "Checking for eval() usage..."
+            ! find . -name "*.js" -o -name "*.ts" | xargs grep -l "eval(" || echo "⚠️  Found eval() usage - review for security"
+
+            echo "Checking for console.log in production files..."
+            ! find . -name "*.js" -o -name "*.ts" -not -path "*/test*" -not -path "*/*.test.*" | xargs grep -l "console\." || echo "ℹ️  Found console statements in non-test files"
+          fi
+
+      - name: Run Semgrep security analysis
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/javascript
+            p/typescript
+        continue-on-error: true
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN || '' }}

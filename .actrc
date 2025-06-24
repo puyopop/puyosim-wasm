@@ -1,0 +1,18 @@
+# Act configuration for local GitHub Actions testing
+
+# Use medium-sized Ubuntu images for better compatibility
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+-P ubuntu-22.04=catthehacker/ubuntu:act-22.04
+-P ubuntu-20.04=catthehacker/ubuntu:act-20.04
+
+# Environment variables file
+--env-file .act.env
+
+# Secrets file (create .act.secrets manually and add to .gitignore)
+--secret-file .act.secrets
+
+# Use gitignore
+--use-gitignore=true
+
+# Container daemon socket
+--container-daemon-socket -
