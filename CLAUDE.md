@@ -6,18 +6,55 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is `puyosim-wasm` - a WebAssembly-based Puyo Puyo simulator project. The repository is currently in early development stage with minimal files.
 
-## Current State
+## Development Workflow
 
-The repository contains only a basic README.md file and is in the initial setup phase. No build system, dependencies, or source code has been established yet.
+### GitHub Issues × Claude Code Integration
 
-## Development Notes
+This project uses a structured workflow combining GitHub Issues with Claude Code custom commands for efficient development:
 
-- This appears to be a fresh repository setup for a Puyo Puyo game simulator using WebAssembly
-- No package.json, Cargo.toml, or other build configuration files are present yet
-- The project structure and build system are yet to be defined
-- Common next steps would likely involve setting up either:
-  - Rust + wasm-pack for WebAssembly compilation
-  - Or another WebAssembly toolchain depending on the chosen implementation language
+#### Custom Commands Available
+
+##### Issue Management
+- `/project:issue-start [issue_number]` - 新しいIssueの作業開始
+- `/project:issue-read [issue_number]` - Issue情報の読み込み
+- `/project:issue-sync` - 現在作業中のIssueと同期
+
+##### Development Support
+- `/project:commit-smart` - インテリジェントコミット
+- `/project:pr-create` - Pull Request作成
+- `/project:cleanup-worktree` - 完了したworktreeの整理
+
+##### Quality Assurance
+- `/project:test-issue` - Issue関連テスト実行
+- `/project:lint-fix` - コードスタイル修正
+- `/project:full-check` - 包括的品質チェック
+
+##### Automation
+- `/project:commit-push-smart` - コミット&プッシュ自動化
+- `/project:check-ci` - CI/CD状況確認
+- `/project:hotfix-start [description]` - 緊急修正開始
+
+#### Workflow Structure
+
+1. **Issue作成**: GitHub上でIssueを作成
+2. **作業開始**: `/project:issue-start [issue_number]` で専用worktreeを作成
+3. **開発作業**: 独立した環境で開発を進行
+4. **品質確認**: `/project:full-check` で包括的チェック
+5. **コミット**: `/project:commit-push-smart` でスマートコミット&プッシュ
+6. **PR作成**: `/project:pr-create` でPull Request作成
+7. **完了処理**: `/project:cleanup-worktree` で環境整理
+
+#### Directory Structure
+```
+project-root/
+├── .claude/
+│   └── commands/           # カスタムコマンド定義
+├── worktrees/
+│   ├── issue-123/         # Issue #123の作業ディレクトリ
+│   └── issue-456/         # Issue #456の作業ディレクトリ
+├── doc/                   # ワークフロー関連ドキュメント
+└── [main development files]
+```
 
 ## Tools Available
 
