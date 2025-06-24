@@ -2,316 +2,345 @@
 
 ## Overview
 
-This document outlines the default and recommended linting and formatting tools
-for JavaScript and TypeScript projects as of 2024.
+This document outlines the Deno-based tooling approach for JavaScript and TypeScript development in this project. This project uses **Deno exclusively** as the JavaScript/TypeScript runtime, which provides built-in formatting, linting, and testing capabilities without requiring additional dependencies or configuration.
 
-## Core Tools
+## Core Philosophy
 
-### ESLint - Linter
+**Deno-First Approach**: This project uses Deno as the primary and only JavaScript/TypeScript runtime. Deno provides all necessary development tools out of the box, eliminating the need for external tools like ESLint, Prettier, Jest, or npm.
 
-**ESLint** is the standard linting tool for JavaScript and TypeScript that finds
-and fixes problems in your code.
+## Built-in Deno Tools
 
-#### Features
+### Formatting - `deno fmt`
 
-- Detects coding standard violations and potential bugs
-- Supports JavaScript, TypeScript, and JSX
-- Highly configurable with extensive plugin ecosystem
-- Can automatically fix many issues
-- Integrated with most editors and build tools
-
-#### Installation
-
-```bash
-# For JavaScript projects
-npm install --save-dev eslint
-
-# For TypeScript projects
-npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
-
-# For React projects
-npm install --save-dev eslint-plugin-react eslint-plugin-react-hooks
-```
-
-#### Usage
-
-```bash
-# Initialize ESLint configuration
-npx eslint --init
-
-# Lint files
-npx eslint src/
-
-# Fix auto-fixable issues
-npx eslint src/ --fix
-
-# Lint specific file
-npx eslint src/app.js
-```
-
-#### Configuration (eslint.config.js - ESLint 9 flat config)
-
-```javascript
-import js from '@eslint/js';
-import typescript from '@typescript-eslint/eslint-plugin';
-import typescriptParser from '@typescript-eslint/parser';
-
-export default [
-  js.configs.recommended,
-  {
-    files: ['**/*.ts', '**/*.tsx'],
-    languageOptions: {
-      parser: typescriptParser,
-      parserOptions: {
-        ecmaVersion: 2024,
-        sourceType: 'module',
-      },
-    },
-    plugins: {
-      '@typescript-eslint': typescript,
-    },
-    rules: {
-      ...typescript.configs.recommended.rules,
-    },
-  },
-];
-```
-
-### Prettier - Code Formatter
-
-**Prettier** is an opinionated code formatter that enforces consistent style
-across your codebase.
+Deno includes a built-in code formatter that enforces consistent style across your codebase.
 
 #### Features
 
-- Automatic code formatting with minimal configuration
-- Supports JavaScript, TypeScript, CSS, HTML, Markdown, and more
-- Integrates with ESLint to prevent conflicts
-- Consistent formatting regardless of original code style
-- Editor integration for format-on-save
-
-#### Installation
-
-```bash
-# Install Prettier
-npm install --save-dev prettier
-
-# Install ESLint integration
-npm install --save-dev eslint-config-prettier eslint-plugin-prettier
-```
+- Zero configuration required
+- Supports JavaScript, TypeScript, JSON, and Markdown
+- Fast and consistent formatting
+- Integrates seamlessly with the Deno ecosystem
 
 #### Usage
 
 ```bash
-# Format files
-npx prettier --write src/
+# Format all files in project
+deno fmt
 
-# Check formatting
-npx prettier --check src/
+# Check formatting without making changes
+deno fmt --check
 
-# Format specific file
-npx prettier --write src/app.js
+# Format specific files or directories
+deno fmt src/
+deno fmt src/tools/puyop-parser.js
+
+# Format and exclude certain files (configured in deno.json)
+deno fmt --exclude=doc/
 ```
 
-#### Configuration (.prettierrc.json)
+#### Project Configuration
+
+The project's formatting is configured in `deno.json`:
 
 ```json
 {
-  "semi": true,
-  "trailingComma": "es5",
-  "singleQuote": true,
-  "printWidth": 80,
-  "tabWidth": 2,
-  "useTabs": false
-}
-```
-
-#### ESLint Integration
-
-Update your ESLint config to work with Prettier:
-
-```javascript
-// eslint.config.js
-import prettierConfig from 'eslint-config-prettier';
-
-export default [
-  // ... other configs
-  prettierConfig, // This should be last
-];
-```
-
-## Testing
-
-### Popular Testing Frameworks
-
-#### Jest (Most Common)
-
-```bash
-npm install --save-dev jest @types/jest
-
-# For TypeScript
-npm install --save-dev ts-jest
-```
-
-#### Vitest (Modern Alternative)
-
-```bash
-npm install --save-dev vitest
-```
-
-#### Usage
-
-```bash
-# Run tests
-npm test
-
-# Run tests in watch mode
-npm test -- --watch
-
-# Run tests with coverage
-npm test -- --coverage
-```
-
-## Package.json Scripts
-
-Add these scripts to your `package.json`:
-
-```json
-{
-  "scripts": {
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix",
-    "format": "prettier --write src/",
-    "format:check": "prettier --check src/",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "check-all": "npm run lint && npm run format:check && npm run test"
+  "fmt": {
+    "semiColons": true,
+    "singleQuote": true,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "include": [
+      "src/",
+      "**/*.js",
+      "**/*.ts"
+    ],
+    "exclude": [
+      "node_modules/",
+      "target/",
+      ".git/",
+      "doc/",
+      "*.md"
+    ]
   }
 }
 ```
 
+### Linting - `deno lint`
+
+Deno includes a built-in linter that finds and reports problems in your JavaScript and TypeScript code.
+
+#### Features
+
+- No configuration needed for basic linting
+- Supports JavaScript and TypeScript
+- Fast static analysis
+- Configurable rules and exclusions
+
+#### Usage
+
+```bash
+# Lint all files in project
+deno lint
+
+# Lint specific files or directories
+deno lint src/
+deno lint src/tools/puyop-parser.js
+
+# Lint with specific rules (configured in deno.json)
+deno lint --rules-tags=recommended
+```
+
+#### Project Configuration
+
+The project's linting is configured in `deno.json`:
+
+```json
+{
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    },
+    "include": [
+      "src/",
+      "**/*.js",
+      "**/*.ts"
+    ],
+    "exclude": [
+      "node_modules/",
+      "target/",
+      ".git/",
+      "doc/"
+    ]
+  }
+}
+```
+
+### Testing - `deno test`
+
+Deno includes a built-in test runner that supports modern testing patterns without additional frameworks.
+
+#### Features
+
+- Built-in assertions library
+- Parallel test execution
+- Code coverage reporting
+- TypeScript support out of the box
+- No additional dependencies required
+
+#### Usage
+
+```bash
+# Run all tests
+deno test
+
+# Run tests with full permissions (for network/file access)
+deno test --allow-all
+
+# Run specific test file
+deno test src/tools/puyop-parser.test.js
+
+# Run tests with coverage
+deno test --allow-all --coverage=coverage
+deno coverage coverage --lcov --output=coverage.lcov
+
+# Run tests matching a pattern
+deno test --filter="parser"
+```
+
+#### Project Configuration
+
+Test configuration in `deno.json`:
+
+```json
+{
+  "test": {
+    "include": [
+      "src/",
+      "**/*.test.{js,ts}"
+    ]
+  }
+}
+```
+
+### Type Checking - `deno check`
+
+Deno provides built-in TypeScript type checking without requiring a separate TypeScript installation.
+
+#### Usage
+
+```bash
+# Type check all TypeScript files
+deno check **/*.ts
+
+# Type check specific file
+deno check src/main.ts
+
+# Type check with remote dependencies
+deno check --reload src/main.ts
+```
+
+## Development Workflow
+
+### Daily Commands
+
+```bash
+# Check formatting
+deno fmt --check
+
+# Apply formatting
+deno fmt
+
+# Run linter
+deno lint
+
+# Type check TypeScript files
+deno check **/*.ts
+
+# Run tests
+deno test --allow-all
+
+# Run all quality checks
+deno fmt --check && deno lint && deno test --allow-all
+```
+
+### Running Project Tools
+
+#### PuyoP.com Parser
+
+```bash
+# Run the parser directly
+deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
+
+# Run parser tests
+deno test --allow-net src/tools/puyop-parser.test.js
+
+# Or use the test runner script
+./src/tools/run-tests.sh
+
+# Make executable and run (optional)
+chmod +x src/tools/puyop-parser.js
+./src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
+```
+
 ## GitHub Actions Integration
 
-### Recommended Workflow Structure
+The project uses Deno in GitHub Actions for continuous integration:
 
 ```yaml
-name: Node.js CI
+name: Deno CI
 
 on: [push, pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18, 20]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          deno-version: v1.x
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Run formatter check
+        run: deno fmt --check
 
       - name: Run linter
-        run: npm run lint
+        run: deno lint
 
-      - name: Check formatting
-        run: npm run format:check
+      - name: Run type check
+        run: deno check **/*.ts
 
       - name: Run tests
-        run: npm test
+        run: deno test --allow-all
 ```
 
 ## IDE Integration
 
 ### VS Code
 
-Install recommended extensions:
+Install the official Deno extension:
 
-- ESLint
-- Prettier - Code formatter
+- **Deno** (denoland.vscode-deno)
 
 #### Settings (.vscode/settings.json)
 
 ```json
 {
+  "deno.enable": true,
+  "deno.enablePaths": ["./src"],
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
+  "editor.defaultFormatter": "denoland.vscode-deno",
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "denoland.vscode-deno"
   }
 }
 ```
 
-## Configuration Files Summary
+## Project Configuration Files
 
-| File               | Purpose                       |
-| ------------------ | ----------------------------- |
-| `eslint.config.js` | ESLint configuration (v9+)    |
-| `.eslintrc.json`   | ESLint configuration (legacy) |
-| `.prettierrc.json` | Prettier configuration        |
-| `.prettierignore`  | Files to ignore in formatting |
-| `package.json`     | Dependencies and scripts      |
-| `tsconfig.json`    | TypeScript configuration      |
+| File        | Purpose                           |
+| ----------- | --------------------------------- |
+| `deno.json` | Deno configuration (fmt, lint, test) |
 
 ## Best Practices
 
-1. **Use ESLint and Prettier together** - they complement each other
-2. **Configure format-on-save** in your editor
-3. **Run linting and formatting in CI** to enforce standards
-4. **Use type-aware linting** for TypeScript projects
-5. **Keep dependencies updated** regularly
-6. **Use consistent configuration** across team members
+1. **Use Deno's built-in tools exclusively** - no need for external formatters or linters
+2. **Configure format-on-save** in your editor with the Deno extension
+3. **Run all checks in CI** using Deno commands
+4. **Keep deno.json configuration minimal** - Deno's defaults are well-designed
+5. **Use `--allow-all` for tests** that need network or file system access
+6. **Leverage TypeScript support** without additional configuration
 
 ## Common Commands Summary
 
 ```bash
-# Install tools
-npm install --save-dev eslint prettier @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-config-prettier
-
-# Lint code
-npm run lint
-
-# Fix linting issues
-npm run lint:fix
-
 # Format code
-npm run format
+deno fmt
 
 # Check formatting
-npm run format:check
+deno fmt --check
+
+# Lint code
+deno lint
+
+# Type check TypeScript
+deno check **/*.ts
 
 # Run tests
-npm test
+deno test --allow-all
 
-# Run all checks
-npm run check-all
+# Run tests with coverage
+deno test --allow-all --coverage=coverage
+
+# Run all quality checks
+deno fmt --check && deno lint && deno check **/*.ts && deno test --allow-all
 ```
 
-## Node.js Runtime Considerations
+## Advantages of Deno-Only Approach
 
-For projects using Deno (like the current puyop-parser.js):
+1. **Zero Dependencies**: No need to install or manage external tools
+2. **Consistent Tooling**: All tools work together seamlessly
+3. **Fast Setup**: New developers can start immediately with just Deno installed
+4. **Security**: Built-in permission system for safe script execution
+5. **Modern Standards**: Native TypeScript support and ES modules
+6. **Simplified CI/CD**: Single runtime handles all development tasks
 
-```bash
-# Deno has built-in formatting and linting
-deno fmt                    # Format code
-deno lint                   # Lint code
-deno test                   # Run tests
-deno check src/main.ts      # Type check
-```
+## Migration from Node.js/npm
 
-Deno provides these tools out of the box without additional configuration,
-making it simpler for single-file scripts and small projects.
+If you're familiar with Node.js tooling, here's the Deno equivalent:
+
+| Node.js/npm Tool | Deno Equivalent |
+| ---------------- | --------------- |
+| `npm install`    | No installation needed |
+| `eslint`         | `deno lint`     |
+| `prettier`       | `deno fmt`      |
+| `jest/mocha`     | `deno test`     |
+| `tsc`            | `deno check`    |
+| `node script.js` | `deno run script.js` |
+
+This Deno-first approach eliminates the complexity of managing multiple tools and their configurations, providing a streamlined development experience focused on writing code rather than configuring tooling.
