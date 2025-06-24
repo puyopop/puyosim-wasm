@@ -9,7 +9,7 @@ testing, linting, and formatting of both Rust and JavaScript/TypeScript code.
 
 ### 1. Rust CI (`.github/workflows/rust.yml`)
 
-**Triggers:** Push and Pull Request to `main` and `develop` branches
+**Triggers:** Push and Pull Request to all branches
 
 **Jobs:**
 
@@ -28,7 +28,7 @@ testing, linting, and formatting of both Rust and JavaScript/TypeScript code.
 
 ### 2. JavaScript/TypeScript CI (`.github/workflows/javascript.yml`)
 
-**Triggers:** Push and Pull Request to `main` and `develop` branches
+**Triggers:** Push and Pull Request to all branches
 
 **Jobs:**
 
@@ -253,8 +253,8 @@ Enable debug logging by setting these repository secrets:
 
 - **Add new Rust versions**: Update the `matrix.rust` array
 - **Add new jobs**: Copy existing job structure and modify as needed
-- **Change trigger branches**: Update the `on.push.branches` and
-  `on.pull_request.branches` arrays
+- **Change trigger branches**: Currently configured to run on all branches for
+  maximum coverage
 
 ### Modifying JavaScript Workflow
 
