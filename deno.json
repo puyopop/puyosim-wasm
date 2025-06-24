@@ -1,0 +1,31 @@
+{
+  "fmt": {
+    "options": {
+      "semiColons": true,
+      "singleQuote": true,
+      "printWidth": 80,
+      "tabWidth": 2
+    },
+    "exclude": [
+      "node_modules/",
+      "target/",
+      ".git/"
+    ]
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    },
+    "exclude": [
+      "node_modules/",
+      "target/",
+      ".git/"
+    ]
+  },
+  "test": {
+    "include": [
+      "src/",
+      "**/*.test.{js,ts}"
+    ]
+  }
+}
