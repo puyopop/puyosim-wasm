@@ -2,6 +2,10 @@
 
 import { parsePuyopUrl } from './puyop-parser.js';
 
+// Check for verbose flag
+const args = Deno.args;
+const verbose = args.includes('--verbose') || args.includes('-v');
+
 // Test cases
 const testCases = [
   {
@@ -178,20 +182,27 @@ RRGGYB`.trim(),
 ];
 
 // Test the parser with sample URLs
-console.log('Testing PuyoP URL Parser\n');
+if (verbose) {
+  console.log('Testing PuyoP URL Parser\n');
+}
 
 let passedTests = 0;
 const totalTests = testCases.length;
+const failedTests = [];
 
 testCases.forEach((testCase, index) => {
-  console.log(`Test ${index + 1}: ${testCase.name}`);
-  console.log(`URL: ${testCase.url}`);
+  if (verbose) {
+    console.log(`Test ${index + 1}: ${testCase.name}`);
+    console.log(`URL: ${testCase.url}`);
+  }
 
   const result = parsePuyopUrl(testCase.url);
 
   if (result) {
-    console.log('Parsed field:');
-    console.log(result);
+    if (verbose) {
+      console.log('Parsed field:');
+      console.log(result);
+    }
 
     // Compare with expected result
     const normalizeText = (text) => text.replace(/\s+/g, ' ').trim();
@@ -199,21 +210,72 @@ testCases.forEach((testCase, index) => {
     const expectedNormalized = normalizeText(testCase.expected);
 
     if (actualNormalized === expectedNormalized) {
-      console.log('✅ PASS - Result matches expected');
+      if (verbose) {
+        console.log('✅ PASS - Result matches expected');
+      }
       passedTests++;
     } else {
-      console.log('❌ FAIL - Result does not match expected');
-      console.log('Expected:');
-      console.log(testCase.expected);
-      console.log('Actual:');
-      console.log(result);
+      const failedTest = {
+        index: index + 1,
+        name: testCase.name,
+        url: testCase.url,
+        expected: testCase.expected,
+        actual: result,
+      };
+      failedTests.push(failedTest);
+
+      if (verbose) {
+        console.log('❌ FAIL - Result does not match expected');
+        console.log('Expected:');
+        console.log(testCase.expected);
+        console.log('Actual:');
+        console.log(result);
+      }
     }
   } else {
-    console.log('Failed to parse or empty field');
-    console.log('❌ FAIL - Could not parse URL');
+    const failedTest = {
+      index: index + 1,
+      name: testCase.name,
+      url: testCase.url,
+      expected: testCase.expected,
+      actual: null,
+      error: 'Could not parse URL',
+    };
+    failedTests.push(failedTest);
+
+    if (verbose) {
+      console.log('Failed to parse or empty field');
+      console.log('❌ FAIL - Could not parse URL');
+    }
   }
 
-  console.log('-'.repeat(50));
+  if (verbose) {
+    console.log('-'.repeat(50));
+  }
 });
 
-console.log(`\nTest Summary: ${passedTests}/${totalTests} tests passed\n`);
+// Always show summary
+console.log(`Test Summary: ${passedTests}/${totalTests} tests passed`);
+
+// Show failed tests details if any failures occurred
+if (failedTests.length > 0) {
+  console.log(`\n❌ ${failedTests.length} test(s) failed:`);
+  failedTests.forEach((test) => {
+    console.log(`\nTest ${test.index}: ${test.name}`);
+    console.log(`URL: ${test.url}`);
+    if (test.error) {
+      console.log(`Error: ${test.error}`);
+    } else {
+      console.log('Expected:');
+      console.log(test.expected);
+      console.log('Actual:');
+      console.log(test.actual);
+    }
+    console.log('-'.repeat(30));
+  });
+}
+
+// Exit with non-zero code if tests failed
+if (failedTests.length > 0) {
+  Deno.exit(1);
+}

@@ -67,7 +67,12 @@ jobs:
         run: |
           if find . -name "*.test.js" -o -name "*.test.ts" | head -1 | grep -q .; then
             echo "Running Deno test files..."
-            deno test --allow-all --coverage=coverage
+            # Run tests quietly first, then with verbose output if they fail
+            if ! deno test --allow-all --coverage=coverage --quiet; then
+              echo "Deno tests failed. Re-running with verbose output for debugging..."
+              deno test --allow-all --coverage=coverage
+              exit 1
+            fi
           else
             echo "No Deno test files found (*.test.js, *.test.ts)"
           fi
@@ -77,10 +82,20 @@ jobs:
           if [ -f "src/tools/run-tests.sh" ]; then
             echo "Running project test script..."
             chmod +x src/tools/run-tests.sh
-            ./src/tools/run-tests.sh
+            # Run tests in quiet mode first
+            if ! ./src/tools/run-tests.sh; then
+              echo "Tests failed. Re-running with verbose output for debugging..."
+              ./src/tools/run-tests.sh --verbose
+              exit 1
+            fi
           elif [ -f "src/tools/puyop-parser.test.js" ]; then
             echo "Running parser tests..."
-            deno run --allow-net src/tools/puyop-parser.test.js
+            # Run tests in quiet mode first
+            if ! deno run --allow-net src/tools/puyop-parser.test.js; then
+              echo "Tests failed. Re-running with verbose output for debugging..."
+              deno run --allow-net src/tools/puyop-parser.test.js --verbose
+              exit 1
+            fi
           else
             echo "No project-specific test script found"
           fi
