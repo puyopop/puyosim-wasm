@@ -16,7 +16,8 @@
       "Bash(gh workflow list:*)",
       "Bash(gh api:*)",
       "Bash(git fetch:*)",
-      "WebFetch(domain:docs.anthropic.com)"
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(git rebase:*)"
     ],
     "deny": []
   }
