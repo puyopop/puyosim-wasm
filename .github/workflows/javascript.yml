@@ -37,10 +37,22 @@ jobs:
         run: deno --version
 
       - name: Check formatting
-        run: deno fmt --check
+        run: |
+          if find . -name "*.js" -o -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./doc/*" | head -1 | grep -q .; then
+            echo "Checking formatting for JavaScript/TypeScript files..."
+            deno fmt --check
+          else
+            echo "No JavaScript/TypeScript files found, skipping format check"
+          fi
 
       - name: Run linter
-        run: deno lint
+        run: |
+          if find . -name "*.js" -o -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./doc/*" | head -1 | grep -q .; then
+            echo "Linting JavaScript/TypeScript files..."
+            deno lint
+          else
+            echo "No JavaScript/TypeScript files found, skipping lint"
+          fi
 
       - name: Type check TypeScript files
         run: |
