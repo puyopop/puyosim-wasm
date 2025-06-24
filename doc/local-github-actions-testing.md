@@ -2,13 +2,16 @@
 
 ## Overview
 
-This guide covers tools and methods for testing GitHub Actions workflows locally, allowing you to debug and validate your CI/CD pipelines before pushing to GitHub.
+This guide covers tools and methods for testing GitHub Actions workflows
+locally, allowing you to debug and validate your CI/CD pipelines before pushing
+to GitHub.
 
 ## Primary Tools
 
 ### 1. Act (nektos/act) - Recommended
 
-**Act** is the most popular and comprehensive tool for running GitHub Actions locally using Docker containers.
+**Act** is the most popular and comprehensive tool for running GitHub Actions
+locally using Docker containers.
 
 #### Installation
 
@@ -66,12 +69,14 @@ Create `.actrc` file in your project root:
 #### Secrets and Environment Variables
 
 Create `.act.secrets` file:
+
 ```
 GITHUB_TOKEN=your_token_here
 CODECOV_TOKEN=your_codecov_token
 ```
 
 Create `.act.env` file:
+
 ```
 CI=true
 GITHUB_ACTIONS=true
@@ -113,7 +118,8 @@ local-action run .
 local-action run . --input param1=value1 --input param2=value2
 ```
 
-**Limitations**: Only supports JavaScript/TypeScript actions, not full workflows.
+**Limitations**: Only supports JavaScript/TypeScript actions, not full
+workflows.
 
 ## Debugging Strategies
 
@@ -130,6 +136,7 @@ Add this step to your workflow for interactive debugging:
 ### 2. Debug Mode
 
 Enable verbose logging by setting repository secrets:
+
 - `ACTIONS_RUNNER_DEBUG`: `true`
 - `ACTIONS_STEP_DEBUG`: `true`
 
@@ -176,6 +183,7 @@ brew install act
 #### 2. Create Act Configuration
 
 Create `.actrc`:
+
 ```
 -P ubuntu-latest=catthehacker/ubuntu:act-latest
 --container-daemon-socket -
@@ -184,6 +192,7 @@ Create `.actrc`:
 #### 3. Create Environment File
 
 Create `.act.env`:
+
 ```
 CI=true
 GITHUB_ACTIONS=true
@@ -274,35 +283,35 @@ Create `.vscode/tasks.json`:
 
 ```json
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Act: Run All Workflows",
-            "type": "shell",
-            "command": "act",
-            "group": "test",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "Act: Run Deno Workflow",
-            "type": "shell",
-            "command": "act",
-            "args": ["-W", ".github/workflows/javascript.yml", "-j", "deno"],
-            "group": "test"
-        },
-        {
-            "label": "Act: List Workflows",
-            "type": "shell",
-            "command": "act",
-            "args": ["-l"],
-            "group": "test"
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Act: Run All Workflows",
+      "type": "shell",
+      "command": "act",
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Act: Run Deno Workflow",
+      "type": "shell",
+      "command": "act",
+      "args": ["-W", ".github/workflows/javascript.yml", "-j", "deno"],
+      "group": "test"
+    },
+    {
+      "label": "Act: List Workflows",
+      "type": "shell",
+      "command": "act",
+      "args": ["-l"],
+      "group": "test"
+    }
+  ]
 }
 ```
 
@@ -426,4 +435,7 @@ Using local testing can significantly reduce GitHub Actions usage:
 
 ## Summary
 
-Act provides the most comprehensive solution for local GitHub Actions testing, especially for mixed Rust/Deno projects like this one. Combined with proper debugging techniques and VS Code integration, it enables efficient CI/CD development and validation.
+Act provides the most comprehensive solution for local GitHub Actions testing,
+especially for mixed Rust/Deno projects like this one. Combined with proper
+debugging techniques and VS Code integration, it enables efficient CI/CD
+development and validation.

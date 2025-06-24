@@ -1,6 +1,7 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## Project Overview
 
@@ -9,6 +10,7 @@ This is `puyosim-wasm` - a WebAssembly-based Puyo Puyo simulator project. The re
 ## Development Environment
 
 **Primary Runtime: Deno**
+
 - This project uses Deno as the primary JavaScript/TypeScript runtime
 - Deno provides built-in formatting, linting, and testing capabilities
 - No npm or package.json required for basic development
@@ -66,7 +68,8 @@ project-root/
 ## Development Notes
 
 - This is a Puyo Puyo game simulator project with WebAssembly goals
-- **Deno-first approach**: All JavaScript/TypeScript development uses Deno runtime
+- **Deno-first approach**: All JavaScript/TypeScript development uses Deno
+  runtime
 - GitHub Actions configured for automated testing, linting, and formatting
 - Future WebAssembly components may use Rust + wasm-pack
 - Documentation and tooling guides available in `doc/` directory
@@ -74,11 +77,14 @@ project-root/
 ## Tools Available
 
 ### PuyoP.com Parser
-- `src/tools/puyop-parser.js` - Parses puyop.com simulator URLs and converts field data to plain text
+
+- `src/tools/puyop-parser.js` - Parses puyop.com simulator URLs and converts
+  field data to plain text
 - `src/tools/puyop-parser.test.js` - Test script for the parser functionality
 - `src/tools/run-tests.sh` - Test runner script
 
 **Usage:**
+
 ```bash
 # Run the parser directly
 deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
@@ -94,10 +100,12 @@ chmod +x src/tools/puyop-parser.js
 ./src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
 ```
 
-The parser converts encoded field data into plain text format using these symbols:
+The parser converts encoded field data into plain text format using these
+symbols:
+
 - `.` = Empty cell
 - `R` = Red puyo
-- `G` = Green puyo  
+- `G` = Green puyo
 - `B` = Blue puyo
 - `Y` = Yellow puyo
 - `P` = Purple puyo
@@ -108,6 +116,7 @@ The parser converts encoded field data into plain text format using these symbol
 ### Deno Commands
 
 **Formatting and Linting:**
+
 ```bash
 # Check formatting
 deno fmt --check
@@ -123,6 +132,7 @@ deno check **/*.ts
 ```
 
 **Testing:**
+
 ```bash
 # Run all tests
 deno test --allow-all
@@ -139,11 +149,15 @@ deno coverage coverage --lcov --output=coverage.lcov
 
 The repository is configured with automated CI/CD:
 
-- **Deno CI** (`.github/workflows/javascript.yml`): Runs formatting, linting, type checking, and tests
-- **Rust CI** (`.github/workflows/rust.yml`): Will handle Rust/WebAssembly components when added
-- **Local Testing**: Use `act` tool for local GitHub Actions testing (see `doc/local-github-actions-testing.md`)
+- **Deno CI** (`.github/workflows/javascript.yml`): Runs formatting, linting,
+  type checking, and tests
+- **Rust CI** (`.github/workflows/rust.yml`): Will handle Rust/WebAssembly
+  components when added
+- **Local Testing**: Use `act` tool for local GitHub Actions testing (see
+  `doc/local-github-actions-testing.md`)
 
 **Trigger workflows locally:**
+
 ```bash
 # Install act (if not already installed)
 brew install act
@@ -164,7 +178,8 @@ act -j deno
 ## Future Development
 
 **Planned features:**
+
 - Rust + WebAssembly core engine
-- Extended Puyo Puyo simulation capabilities  
+- Extended Puyo Puyo simulation capabilities
 - Web interface for game simulation
 - Performance optimization and benchmarking

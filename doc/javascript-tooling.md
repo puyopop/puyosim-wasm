@@ -2,15 +2,18 @@
 
 ## Overview
 
-This document outlines the default and recommended linting and formatting tools for JavaScript and TypeScript projects as of 2024.
+This document outlines the default and recommended linting and formatting tools
+for JavaScript and TypeScript projects as of 2024.
 
 ## Core Tools
 
 ### ESLint - Linter
 
-**ESLint** is the standard linting tool for JavaScript and TypeScript that finds and fixes problems in your code.
+**ESLint** is the standard linting tool for JavaScript and TypeScript that finds
+and fixes problems in your code.
 
 #### Features
+
 - Detects coding standard violations and potential bugs
 - Supports JavaScript, TypeScript, and JSX
 - Highly configurable with extensive plugin ecosystem
@@ -18,6 +21,7 @@ This document outlines the default and recommended linting and formatting tools 
 - Integrated with most editors and build tools
 
 #### Installation
+
 ```bash
 # For JavaScript projects
 npm install --save-dev eslint
@@ -30,6 +34,7 @@ npm install --save-dev eslint-plugin-react eslint-plugin-react-hooks
 ```
 
 #### Usage
+
 ```bash
 # Initialize ESLint configuration
 npx eslint --init
@@ -45,6 +50,7 @@ npx eslint src/app.js
 ```
 
 #### Configuration (eslint.config.js - ESLint 9 flat config)
+
 ```javascript
 import js from '@eslint/js';
 import typescript from '@typescript-eslint/eslint-plugin';
@@ -73,9 +79,11 @@ export default [
 
 ### Prettier - Code Formatter
 
-**Prettier** is an opinionated code formatter that enforces consistent style across your codebase.
+**Prettier** is an opinionated code formatter that enforces consistent style
+across your codebase.
 
 #### Features
+
 - Automatic code formatting with minimal configuration
 - Supports JavaScript, TypeScript, CSS, HTML, Markdown, and more
 - Integrates with ESLint to prevent conflicts
@@ -83,6 +91,7 @@ export default [
 - Editor integration for format-on-save
 
 #### Installation
+
 ```bash
 # Install Prettier
 npm install --save-dev prettier
@@ -92,6 +101,7 @@ npm install --save-dev eslint-config-prettier eslint-plugin-prettier
 ```
 
 #### Usage
+
 ```bash
 # Format files
 npx prettier --write src/
@@ -104,6 +114,7 @@ npx prettier --write src/app.js
 ```
 
 #### Configuration (.prettierrc.json)
+
 ```json
 {
   "semi": true,
@@ -116,7 +127,9 @@ npx prettier --write src/app.js
 ```
 
 #### ESLint Integration
+
 Update your ESLint config to work with Prettier:
+
 ```javascript
 // eslint.config.js
 import prettierConfig from 'eslint-config-prettier';
@@ -132,6 +145,7 @@ export default [
 ### Popular Testing Frameworks
 
 #### Jest (Most Common)
+
 ```bash
 npm install --save-dev jest @types/jest
 
@@ -140,11 +154,13 @@ npm install --save-dev ts-jest
 ```
 
 #### Vitest (Modern Alternative)
+
 ```bash
 npm install --save-dev vitest
 ```
 
 #### Usage
+
 ```bash
 # Run tests
 npm test
@@ -190,37 +206,40 @@ jobs:
     strategy:
       matrix:
         node-version: [18, 20]
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Run linter
-      run: npm run lint
-    
-    - name: Check formatting
-      run: npm run format:check
-    
-    - name: Run tests
-      run: npm test
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Run tests
+        run: npm test
 ```
 
 ## IDE Integration
 
 ### VS Code
+
 Install recommended extensions:
+
 - ESLint
 - Prettier - Code formatter
 
 #### Settings (.vscode/settings.json)
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -239,14 +258,14 @@ Install recommended extensions:
 
 ## Configuration Files Summary
 
-| File | Purpose |
-|------|---------|
-| `eslint.config.js` | ESLint configuration (v9+) |
-| `.eslintrc.json` | ESLint configuration (legacy) |
-| `.prettierrc.json` | Prettier configuration |
-| `.prettierignore` | Files to ignore in formatting |
-| `package.json` | Dependencies and scripts |
-| `tsconfig.json` | TypeScript configuration |
+| File               | Purpose                       |
+| ------------------ | ----------------------------- |
+| `eslint.config.js` | ESLint configuration (v9+)    |
+| `.eslintrc.json`   | ESLint configuration (legacy) |
+| `.prettierrc.json` | Prettier configuration        |
+| `.prettierignore`  | Files to ignore in formatting |
+| `package.json`     | Dependencies and scripts      |
+| `tsconfig.json`    | TypeScript configuration      |
 
 ## Best Practices
 
@@ -294,4 +313,5 @@ deno test                   # Run tests
 deno check src/main.ts      # Type check
 ```
 
-Deno provides these tools out of the box without additional configuration, making it simpler for single-file scripts and small projects.
+Deno provides these tools out of the box without additional configuration,
+making it simpler for single-file scripts and small projects.

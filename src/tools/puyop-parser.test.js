@@ -1,12 +1,12 @@
 #!/usr/bin/env deno run --allow-net
 
-import { parsePuyopUrl } from "./puyop-parser.js";
+import { parsePuyopUrl } from './puyop-parser.js';
 
 // Test cases
 const testCases = [
   {
-    name: "Empty field (minimal code)",
-    url: "https://www.puyop.com/s/000",
+    name: 'Empty field (minimal code)',
+    url: 'https://www.puyop.com/s/000',
     expected: `......
 ......
 ......
@@ -22,8 +22,8 @@ const testCases = [
 ......`.trim(),
   },
   {
-    name: "Path-based field code",
-    url: "https://www.puyop.com/s/pg0ra09i0",
+    name: 'Path-based field code',
+    url: 'https://www.puyop.com/s/pg0ra09i0',
     expected: `......
 ......
 ......
@@ -39,8 +39,8 @@ BBRG..
 RRGG..`.trim(),
   },
   {
-    name: "Another example field",
-    url: "https://www.puyop.com/s/123abc",
+    name: 'Another example field',
+    url: 'https://www.puyop.com/s/123abc',
     expected: `......
 ......
 ......
@@ -56,8 +56,8 @@ RRGG..`.trim(),
 RGRBRY`.trim(),
   },
   {
-    name: "Complex field with multiple puyos",
-    url: "https://www.puyop.com/s/3pkrraA9iz",
+    name: 'Complex field with multiple puyos',
+    url: 'https://www.puyop.com/s/3pkrraA9iz',
     expected: `......
 ......
 ......
@@ -73,8 +73,8 @@ BBRGYY
 RRGGYB`.trim(),
   },
   {
-    name: "Very complex field with long code",
-    url: "https://www.puyop.com/s/804rcxpcpAxbpkrraA9iz",
+    name: 'Very complex field with long code',
+    url: 'https://www.puyop.com/s/804rcxpcpAxbpkrraA9iz',
     expected: `......
 ......
 ......
@@ -91,8 +91,8 @@ RRGGYB`.trim(),
   },
   // New test cases based on specifications
   {
-    name: "Single puyo - R at bottom right",
-    url: "https://www.puyop.com/s/1",
+    name: 'Single puyo - R at bottom right',
+    url: 'https://www.puyop.com/s/1',
     expected: `......
 ......
 ......
@@ -108,8 +108,8 @@ RRGGYB`.trim(),
 .....R`.trim(),
   },
   {
-    name: "Horizontal pair - RR",
-    url: "https://www.puyop.com/s/9",
+    name: 'Horizontal pair - RR',
+    url: 'https://www.puyop.com/s/9',
     expected: `......
 ......
 ......
@@ -125,8 +125,8 @@ RRGGYB`.trim(),
 ....RR`.trim(),
   },
   {
-    name: "Horizontal pair - RB",
-    url: "https://www.puyop.com/s/b",
+    name: 'Horizontal pair - RB',
+    url: 'https://www.puyop.com/s/b',
     expected: `......
 ......
 ......
@@ -142,8 +142,8 @@ RRGGYB`.trim(),
 ....RB`.trim(),
   },
   {
-    name: "Horizontal triple - RRY",
-    url: "https://www.puyop.com/s/1c",
+    name: 'Horizontal triple - RRY',
+    url: 'https://www.puyop.com/s/1c',
     expected: `......
 ......
 ......
@@ -159,8 +159,8 @@ RRGGYB`.trim(),
 ...RRY`.trim(),
   },
   {
-    name: "Vertical pair - RR",
-    url: "https://www.puyop.com/s/1001",
+    name: 'Vertical pair - RR',
+    url: 'https://www.puyop.com/s/1001',
     expected: `......
 ......
 ......
@@ -178,10 +178,10 @@ RRGGYB`.trim(),
 ];
 
 // Test the parser with sample URLs
-console.log("Testing PuyoP URL Parser\n");
+console.log('Testing PuyoP URL Parser\n');
 
 let passedTests = 0;
-let totalTests = testCases.length;
+const totalTests = testCases.length;
 
 testCases.forEach((testCase, index) => {
   console.log(`Test ${index + 1}: ${testCase.name}`);
@@ -190,30 +190,30 @@ testCases.forEach((testCase, index) => {
   const result = parsePuyopUrl(testCase.url);
 
   if (result) {
-    console.log("Parsed field:");
+    console.log('Parsed field:');
     console.log(result);
-    
+
     // Compare with expected result
     const normalizeText = (text) => text.replace(/\s+/g, ' ').trim();
     const actualNormalized = normalizeText(result);
     const expectedNormalized = normalizeText(testCase.expected);
-    
+
     if (actualNormalized === expectedNormalized) {
-      console.log("✅ PASS - Result matches expected");
+      console.log('✅ PASS - Result matches expected');
       passedTests++;
     } else {
-      console.log("❌ FAIL - Result does not match expected");
-      console.log("Expected:");
+      console.log('❌ FAIL - Result does not match expected');
+      console.log('Expected:');
       console.log(testCase.expected);
-      console.log("Actual:");
+      console.log('Actual:');
       console.log(result);
     }
   } else {
-    console.log("Failed to parse or empty field");
-    console.log("❌ FAIL - Could not parse URL");
+    console.log('Failed to parse or empty field');
+    console.log('❌ FAIL - Could not parse URL');
   }
 
-  console.log("-".repeat(50));
+  console.log('-'.repeat(50));
 });
 
 console.log(`\nTest Summary: ${passedTests}/${totalTests} tests passed\n`);

@@ -1,11 +1,9 @@
 {
   "fmt": {
-    "options": {
-      "semiColons": true,
-      "singleQuote": true,
-      "printWidth": 80,
-      "tabWidth": 2
-    },
+    "semiColons": true,
+    "singleQuote": true,
+    "lineWidth": 80,
+    "indentWidth": 2,
     "exclude": [
       "node_modules/",
       "target/",

@@ -2,7 +2,8 @@
 
 ## Overview
 
-This repository is configured with GitHub Actions workflows for automated testing, linting, and formatting of both Rust and JavaScript/TypeScript code.
+This repository is configured with GitHub Actions workflows for automated
+testing, linting, and formatting of both Rust and JavaScript/TypeScript code.
 
 ## Workflows
 
@@ -11,12 +12,14 @@ This repository is configured with GitHub Actions workflows for automated testin
 **Triggers:** Push and Pull Request to `main` and `develop` branches
 
 **Jobs:**
+
 - **Test**: Runs tests on multiple Rust versions (stable, beta)
 - **Lint**: Checks code formatting and runs Clippy linting
 - **Security**: Runs `cargo audit` for dependency vulnerabilities
 - **Coverage**: Generates code coverage reports using `cargo-tarpaulin`
 
 **Features:**
+
 - Cargo caching for faster builds
 - Multiple Rust version testing
 - Strict linting with warnings treated as errors
@@ -28,12 +31,15 @@ This repository is configured with GitHub Actions workflows for automated testin
 **Triggers:** Push and Pull Request to `main` and `develop` branches
 
 **Jobs:**
-- **Node.js**: Tests with multiple Node.js versions (18, 20, 22) - only if `package.json` exists
+
+- **Node.js**: Tests with multiple Node.js versions (18, 20, 22) - only if
+  `package.json` exists
 - **Deno**: Tests with Deno runtime for standalone scripts
 - **Standalone Lint**: Linting for projects without `package.json`
 - **Security**: Runs security scans including npm audit and Semgrep
 
 **Features:**
+
 - Multi-runtime support (Node.js and Deno)
 - Conditional execution based on project structure
 - Security scanning with multiple tools
@@ -46,6 +52,7 @@ This repository is configured with GitHub Actions workflows for automated testin
 Create these files in your project root as needed:
 
 #### `rustfmt.toml`
+
 ```toml
 max_width = 100
 hard_tabs = false
@@ -54,6 +61,7 @@ edition = "2021"
 ```
 
 #### `clippy.toml`
+
 ```toml
 avoid-breaking-exported-api = false
 msrv = "1.70.0"
@@ -64,6 +72,7 @@ msrv = "1.70.0"
 #### For Node.js Projects
 
 **`package.json` scripts:**
+
 ```json
 {
   "scripts": {
@@ -79,6 +88,7 @@ msrv = "1.70.0"
 ```
 
 **`eslint.config.js` (ESLint 9 flat config):**
+
 ```javascript
 import js from '@eslint/js';
 import typescript from '@typescript-eslint/eslint-plugin';
@@ -106,6 +116,7 @@ export default [
 ```
 
 **`.prettierrc.json`:**
+
 ```json
 {
   "semi": true,
@@ -120,11 +131,13 @@ export default [
 #### For Deno Projects
 
 Deno projects work out of the box with built-in tools:
+
 - `deno fmt` for formatting
 - `deno lint` for linting
 - `deno test` for testing
 
 Optional `deno.json` configuration:
+
 ```json
 {
   "fmt": {
@@ -145,7 +158,8 @@ Optional `deno.json` configuration:
 
 ### Required Secrets (Optional)
 
-Set these in your GitHub repository settings under Secrets and variables > Actions:
+Set these in your GitHub repository settings under Secrets and variables >
+Actions:
 
 - `CODECOV_TOKEN`: For code coverage reporting
 - `SEMGREP_APP_TOKEN`: For enhanced security scanning
@@ -229,6 +243,7 @@ deno test --allow-all
 ### Workflow Debugging
 
 Enable debug logging by setting these repository secrets:
+
 - `ACTIONS_RUNNER_DEBUG`: `true`
 - `ACTIONS_STEP_DEBUG`: `true`
 
@@ -238,13 +253,15 @@ Enable debug logging by setting these repository secrets:
 
 - **Add new Rust versions**: Update the `matrix.rust` array
 - **Add new jobs**: Copy existing job structure and modify as needed
-- **Change trigger branches**: Update the `on.push.branches` and `on.pull_request.branches` arrays
+- **Change trigger branches**: Update the `on.push.branches` and
+  `on.pull_request.branches` arrays
 
 ### Modifying JavaScript Workflow
 
 - **Add Node.js versions**: Update the `matrix.node-version` array
 - **Add new Deno versions**: Update the `matrix.deno-version` array
-- **Modify conditional execution**: Update the `if` conditions in job definitions
+- **Modify conditional execution**: Update the `if` conditions in job
+  definitions
 
 ## Performance Optimizations
 

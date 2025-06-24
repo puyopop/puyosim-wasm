@@ -1,6 +1,7 @@
 # PuyoP Parser Tools
 
-This directory contains tools for parsing PuyoP.com simulator URLs and converting field data to plain text format.
+This directory contains tools for parsing PuyoP.com simulator URLs and
+converting field data to plain text format.
 
 ## Files
 
@@ -34,10 +35,12 @@ deno run --allow-net puyop-parser.test.js
 
 ## Output Format
 
-The parser converts encoded field data into plain text format using these symbols:
+The parser converts encoded field data into plain text format using these
+symbols:
+
 - `.` = Empty cell
 - `R` = Red puyo
-- `G` = Green puyo  
+- `G` = Green puyo
 - `B` = Blue puyo
 - `Y` = Yellow puyo
 - `P` = Purple puyo

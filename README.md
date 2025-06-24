@@ -3,12 +3,15 @@
 ![Deno CI](https://github.com/your-username/puyosim-wasm/workflows/Deno%20CI/badge.svg)
 ![Rust CI](https://github.com/your-username/puyosim-wasm/workflows/Rust%20CI/badge.svg)
 
-A WebAssembly-based Puyo Puyo simulator project with Deno-powered development tools.
+A WebAssembly-based Puyo Puyo simulator project with Deno-powered development
+tools.
 
 ## Features
 
-- **PuyoP.com Parser**: Convert puyop.com simulator URLs to plain text field representations
-- **Deno-first Development**: Modern JavaScript/TypeScript runtime with built-in tooling
+- **PuyoP.com Parser**: Convert puyop.com simulator URLs to plain text field
+  representations
+- **Deno-first Development**: Modern JavaScript/TypeScript runtime with built-in
+  tooling
 - **GitHub Actions CI/CD**: Automated testing, linting, and formatting
 - **Local Testing**: Support for local GitHub Actions testing with `act`
 
@@ -17,8 +20,9 @@ A WebAssembly-based Puyo Puyo simulator project with Deno-powered development to
 ### Prerequisites
 
 - [Deno](https://deno.land/) - Primary runtime for JavaScript/TypeScript
-- [Rust](https://rustup.rs/) - For future WebAssembly components
+- [Rust](https://rustup.rs/) - For future WebAssembly components (optional)
 - [act](https://github.com/nektos/act) - Optional, for local CI testing
+- [GitHub CLI](https://cli.github.com/) - Optional, for workflow management
 
 ### Installation
 
@@ -33,6 +37,17 @@ iwr https://deno.land/x/install/install.ps1 -useb | iex
 # Or using package managers
 # macOS: brew install deno
 # Windows: winget install DenoLand.Deno
+
+# Install optional tools
+# GitHub CLI (for workflow management)
+# macOS: brew install gh
+# Windows: winget install GitHub.cli
+# Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+
+# act (for local CI testing)
+# macOS: brew install act  
+# Windows: winget install nektos.act
+# Linux: curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
 ```
 
 ### Usage
@@ -106,13 +121,36 @@ act -j deno
 act --dryrun
 ```
 
-For detailed local testing setup, see [`doc/local-github-actions-testing.md`](doc/local-github-actions-testing.md).
+For detailed local testing setup, see
+[`doc/local-github-actions-testing.md`](doc/local-github-actions-testing.md).
+
+### GitHub Actions Management
+
+Monitor and manage workflows using GitHub CLI:
+
+```bash
+# Authenticate with GitHub (first time only)
+gh auth login
+
+# List recent workflow runs
+gh run list --repo your-username/puyosim-wasm
+
+# View specific workflow run details
+gh run view <run-id>
+
+# View failed workflow logs
+gh run view <run-id> --log-failed
+
+# Re-run failed workflows
+gh run rerun <run-id>
+```
 
 ### GitHub Actions
 
 The project includes comprehensive CI/CD workflows:
 
-- **Deno CI**: Formatting, linting, type checking, testing, and security scanning
+- **Deno CI**: Formatting, linting, type checking, testing, and security
+  scanning
 - **Rust CI**: Ready for future WebAssembly components
 - **Matrix Testing**: Multiple Deno versions (v1.x, v2.x)
 - **Security Scanning**: Dependency auditing and code analysis
@@ -120,25 +158,30 @@ The project includes comprehensive CI/CD workflows:
 ## Documentation
 
 - [`doc/rust-tooling.md`](doc/rust-tooling.md) - Rust development tools guide
-- [`doc/javascript-tooling.md`](doc/javascript-tooling.md) - JavaScript/TypeScript tooling guide  
-- [`doc/github-actions-setup.md`](doc/github-actions-setup.md) - GitHub Actions configuration guide
-- [`doc/local-github-actions-testing.md`](doc/local-github-actions-testing.md) - Local CI testing guide
+- [`doc/javascript-tooling.md`](doc/javascript-tooling.md) -
+  JavaScript/TypeScript tooling guide
+- [`doc/github-actions-setup.md`](doc/github-actions-setup.md) - GitHub Actions
+  configuration guide
+- [`doc/local-github-actions-testing.md`](doc/local-github-actions-testing.md) -
+  Local CI testing guide
 
 ## PuyoP.com Parser
 
-The parser converts encoded field data from puyop.com URLs into human-readable format:
+The parser converts encoded field data from puyop.com URLs into human-readable
+format:
 
-| Symbol | Meaning |
-|--------|---------|
-| `.` | Empty cell |
-| `R` | Red puyo |
-| `G` | Green puyo |
-| `B` | Blue puyo |
-| `Y` | Yellow puyo |
-| `P` | Purple puyo |
-| `O` | Ojama (garbage) |
+| Symbol | Meaning         |
+| ------ | --------------- |
+| `.`    | Empty cell      |
+| `R`    | Red puyo        |
+| `G`    | Green puyo      |
+| `B`    | Blue puyo       |
+| `Y`    | Yellow puyo     |
+| `P`    | Purple puyo     |
+| `O`    | Ojama (garbage) |
 
 Example:
+
 ```bash
 deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
 ```
@@ -170,4 +213,5 @@ deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the LICENSE file for
+details.
