@@ -215,4 +215,3 @@ deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
 
 This project is licensed under the MIT License - see the LICENSE file for
 details.
-# Trigger CI
