@@ -8,6 +8,18 @@ const PUYO_COLORS = {
   4: 'Y', // Yellow
   5: 'P', // Purple
   6: 'O', // Ojama
+  7: 'T', // Iron/Tetsugami
+};
+
+const COLOR_TO_NUMBER = {
+  '.': 0, // Empty
+  'R': 1, // Red
+  'G': 2, // Green
+  'B': 3, // Blue
+  'Y': 4, // Yellow
+  'P': 5, // Purple
+  'O': 6, // Ojama
+  'T': 7, // Iron/Tetsugami
 };
 
 const FIELD_WIDTH = 6;
@@ -22,6 +34,13 @@ function base62ToDecimal(char) {
     throw new Error(`Invalid base62 character: ${char}`);
   }
   return index;
+}
+
+function decimalToBase62(num) {
+  if (num < 0 || num >= 62) {
+    throw new Error(`Number out of base62 range: ${num}`);
+  }
+  return BASE62_CHARS[num];
 }
 
 function decodeFieldString(encodedString) {
@@ -71,6 +90,74 @@ function fieldToString(field) {
   ).join('\n');
 }
 
+function parseFieldText(plainText) {
+  const lines = plainText.split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !line.startsWith('#'));
+
+  const field = Array(FIELD_HEIGHT).fill().map(() =>
+    Array(FIELD_WIDTH).fill(0)
+  );
+
+  const startRow = Math.max(0, FIELD_HEIGHT - lines.length);
+
+  lines.forEach((line, index) => {
+    const row = startRow + index;
+    if (row >= FIELD_HEIGHT) return;
+
+    for (let col = 0; col < Math.min(line.length, FIELD_WIDTH); col++) {
+      const char = line[col].toUpperCase();
+      if (Object.prototype.hasOwnProperty.call(COLOR_TO_NUMBER, char)) {
+        field[row][col] = COLOR_TO_NUMBER[char];
+      } else {
+        throw new Error(
+          `Invalid character '${char}' at row ${row + 1}, column ${col + 1}`,
+        );
+      }
+    }
+  });
+
+  return field;
+}
+
+function encodeFieldToString(field) {
+  const encodedChars = [];
+  let currentRow = 12;
+  let currentCol = 5;
+
+  while (currentRow >= 0) {
+    const rightValue = field[currentRow][currentCol] || 0;
+    const leftValue = (currentCol > 0)
+      ? (field[currentRow][currentCol - 1] || 0)
+      : 0;
+
+    const combined = (leftValue << 3) | rightValue;
+    encodedChars.unshift(decimalToBase62(combined));
+
+    currentCol -= 2;
+    if (currentCol < 0) {
+      currentRow--;
+      currentCol = 5;
+    }
+  }
+
+  // Remove leading zeros
+  let result = encodedChars.join('');
+  result = result.replace(/^0+/, '');
+
+  return result || '000';
+}
+
+function plainTextToPuyopUrl(plainText) {
+  try {
+    const field = parseFieldText(plainText);
+    const encodedString = encodeFieldToString(field);
+    return `https://www.puyop.com/s/${encodedString}`;
+  } catch (error) {
+    throw new Error(`Failed to convert plain text to URL: ${error.message}`);
+  }
+}
+
 function parsePuyopUrl(url) {
   try {
     const urlObj = new URL(url);
@@ -94,17 +181,31 @@ function parsePuyopUrl(url) {
 if (import.meta.main) {
   const args = Deno.args;
   if (args.length === 0) {
-    console.error('Usage: deno run --allow-net puyop_parser.js <puyop_url>');
+    console.error('Usage:');
     console.error(
-      'Example: deno run --allow-net puyop_parser.js "https://www.puyop.com/s/1"',
+      '  URL to Plain Text: deno run --allow-net puyop_parser.js <puyop_url>',
     );
+    console.error(
+      '  Plain Text to URL: deno run --allow-net puyop_parser.js --to-url <plain_text>',
+    );
+    console.error('Examples:');
+    console.error(
+      '  deno run --allow-net puyop_parser.js "https://www.puyop.com/s/1"',
+    );
+    console.error('  deno run --allow-net puyop_parser.js --to-url "RG\\nRB"');
     Deno.exit(1);
   }
 
-  const url = args[0];
   try {
-    const result = parsePuyopUrl(url);
-    console.log(result);
+    if (args[0] === '--to-url' && args.length > 1) {
+      const plainText = args.slice(1).join(' ').replace(/\\n/g, '\n');
+      const result = plainTextToPuyopUrl(plainText);
+      console.log(result);
+    } else {
+      const url = args[0];
+      const result = parsePuyopUrl(url);
+      console.log(result);
+    }
   } catch (error) {
     console.error(`Error: ${error.message}`);
     Deno.exit(1);
@@ -112,4 +213,4 @@ if (import.meta.main) {
 }
 
 // Export for use as module
-export { parsePuyopUrl };
+export { fieldToString, parseFieldText, parsePuyopUrl, plainTextToPuyopUrl };
