@@ -284,12 +284,12 @@ const bidirectionalTests = [
   {
     name: 'Single red puyo',
     plainText: '.....R',
-    expectedUrl: 'https://www.puyop.com/s/1',
+    expectedUrl: 'https://www.puyop.com/s/=000000000000000000000000000000000000000000000000000000000000000000000000000001',
   },
   {
     name: 'Horizontal pair RR',
     plainText: '....RR',
-    expectedUrl: 'https://www.puyop.com/s/9',
+    expectedUrl: 'https://www.puyop.com/s/=000000000000000000000000000000000000000000000000000000000000000000000000000011',
   },
   {
     name: 'GTR setup',

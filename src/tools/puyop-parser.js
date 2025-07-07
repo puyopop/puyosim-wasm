@@ -8,7 +8,8 @@ const PUYO_COLORS = {
   4: 'Y', // Yellow
   5: 'P', // Purple
   6: 'O', // Ojama
-  7: 'T', // Iron/Tetsugami
+  7: 'K', // Kata
+  8: 'T', // Iron/Tetsugami
 };
 
 const COLOR_TO_NUMBER = {
@@ -19,7 +20,8 @@ const COLOR_TO_NUMBER = {
   'Y': 4, // Yellow
   'P': 5, // Purple
   'O': 6, // Ojama
-  'T': 7, // Iron/Tetsugami
+  'K': 7, // Kata
+  'T': 8, // Iron/Tetsugami
 };
 
 const FIELD_WIDTH = 6;
@@ -44,6 +46,16 @@ function decimalToBase62(num) {
 }
 
 function decodeFieldString(encodedString) {
+  if (encodedString.length === 0) {
+    return Array(FIELD_HEIGHT).fill().map(() => Array(FIELD_WIDTH).fill(0));
+  }
+  if (encodedString[0] === '=') {
+    return decodeFieldString2(encodedString);
+  }
+  return decodeFieldString1(encodedString);
+}
+
+function decodeFieldString1(encodedString) {
   const field = Array(FIELD_HEIGHT).fill().map(() =>
     Array(FIELD_WIDTH).fill(0)
   );
@@ -77,6 +89,25 @@ function decodeFieldString(encodedString) {
     if (currentRow < 0) break;
   }
 
+  return field;
+}
+
+function decodeFieldString2(encodedString) {  
+  // assert(encodedString[0] === '=');
+  const stack = [...encodedString];
+  const field = Array(FIELD_HEIGHT).fill().map(() =>
+    Array(FIELD_WIDTH).fill(0)
+  );
+  for (let i = FIELD_HEIGHT - 1; i >= 0; i--) {
+    for (let j = FIELD_WIDTH - 1; j >= 0; j--) {
+      if (stack.length === 1) { // "=" の分
+        return field;
+      }
+      const char = stack.pop();
+      const n = parseInt(char);
+      field[i][j] = n;
+    }
+  }
   return field;
 }
 
@@ -121,31 +152,15 @@ function parseFieldText(plainText) {
 }
 
 function encodeFieldToString(field) {
-  const encodedChars = [];
-  let currentRow = 12;
-  let currentCol = 5;
-
-  while (currentRow >= 0) {
-    const rightValue = field[currentRow][currentCol] || 0;
-    const leftValue = (currentCol > 0)
-      ? (field[currentRow][currentCol - 1] || 0)
-      : 0;
-
-    const combined = (leftValue << 3) | rightValue;
-    encodedChars.unshift(decimalToBase62(combined));
-
-    currentCol -= 2;
-    if (currentCol < 0) {
-      currentRow--;
-      currentCol = 5;
+  const reversed = [];
+  for (let i = field.length - 1; i >= 0; i--) {
+    for (let j = field[i].length - 1; j >= 0; j--) {
+      reversed.push(
+          field[i][j]
+      );
     }
   }
-
-  // Remove leading zeros
-  let result = encodedChars.join('');
-  result = result.replace(/^0+/, '');
-
-  return result || '000';
+  return "=" + reversed.reverse().join('');
 }
 
 function plainTextToPuyopUrl(plainText) {
