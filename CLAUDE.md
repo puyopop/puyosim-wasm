@@ -78,30 +78,37 @@ project-root/
 
 ### PuyoP.com Parser
 
-- `src/tools/puyop-parser.js` - Parses puyop.com simulator URLs and converts
-  field data to plain text
-- `src/tools/puyop-parser.test.js` - Test script for the parser functionality
+- `src/tools/puyop-parser.js` - Bidirectional converter between puyop.com URLs and plain text field format
+- `src/tools/puyop-parser.test.js` - Comprehensive test script with bidirectional conversion tests
 - `src/tools/run-tests.sh` - Test runner script
+- `doc/plain-text-field-format.md` - Complete specification for plain text field format
 
 **Usage:**
 
 ```bash
-# Run the parser directly
-deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
+# Convert puyop.com URL to plain text
+deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/1"
 
-# Run tests
+# Convert plain text to puyop.com URL
+deno run --allow-net src/tools/puyop-parser.js --to-url "RG\nRB"
+
+# Run comprehensive tests (including bidirectional conversion)
 deno run --allow-net src/tools/puyop-parser.test.js
+
+# Run with verbose output
+deno run --allow-net src/tools/puyop-parser.test.js --verbose
 
 # Or use test runner
 ./src/tools/run-tests.sh
 
 # Make executable and run (optional)
 chmod +x src/tools/puyop-parser.js
-./src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
+./src/tools/puyop-parser.js "https://www.puyop.com/s/1"
 ```
 
-The parser converts encoded field data into plain text format using these
-symbols:
+**Plain Text Field Format:**
+
+The parser supports a comprehensive plain text format for representing Puyo Puyo fields:
 
 - `.` = Empty cell
 - `R` = Red puyo
@@ -110,6 +117,34 @@ symbols:
 - `Y` = Yellow puyo
 - `P` = Purple puyo
 - `O` = Ojama (garbage)
+- `T` = Iron puyo (Tetsugami)
+- `#` = Comment line
+
+**Features:**
+- **Bidirectional conversion**: Plain text ↔ puyop.com URLs
+- **Comment support**: Lines starting with `#` are ignored
+- **Flexible formatting**: Trailing empty cells and leading empty rows can be omitted
+- **Error handling**: Comprehensive validation and error reporting
+- **Test coverage**: Includes round-trip conversion tests to ensure data integrity
+
+**Examples:**
+
+```bash
+# GTR setup example
+echo "BO.TP.
+BGRYBP  
+BBGRYY
+GGRRYP" | deno run --allow-net src/tools/puyop-parser.js --to-url
+
+# With comments
+echo "# This is a GTR setup
+BO.TP.  # Top row
+BGRYBP  # Second row  
+BBGRYY  # Third row
+GGRRYP  # Bottom row" | deno run --allow-net src/tools/puyop-parser.js --to-url
+```
+
+See `doc/plain-text-field-format.md` for complete format specification and examples.
 
 ## Development Workflow
 
