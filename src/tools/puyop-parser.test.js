@@ -1,9 +1,6 @@
 #!/usr/bin/env deno run --allow-net
 
-import {
-  parsePuyopUrl,
-  plainTextToPuyopUrl,
-} from './puyop-parser.js';
+import { parsePuyopUrl, plainTextToPuyopUrl } from './puyop-parser.js';
 
 // Check for verbose flag
 const args = Deno.args;
