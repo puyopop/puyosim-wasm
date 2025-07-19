@@ -93,7 +93,8 @@ deno coverage coverage --lcov --output=coverage.lcov
 ```
 ├── .github/workflows/     # GitHub Actions workflows
 ├── doc/                   # Documentation and guides
-├── src/tools/            # Development tools and utilities
+├── puyosim-core/          # Rust simulation library
+├── src/tools/             # Development tools and utilities
 ├── deno.json             # Deno configuration
 ├── CLAUDE.md             # Development guidance for Claude Code
 └── README.md
