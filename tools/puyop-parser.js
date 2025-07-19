@@ -92,7 +92,7 @@ function decodeFieldString1(encodedString) {
   return field;
 }
 
-function decodeFieldString2(encodedString) {  
+function decodeFieldString2(encodedString) {
   // assert(encodedString[0] === '=');
   const stack = [...encodedString];
   const field = Array(FIELD_HEIGHT).fill().map(() =>
@@ -156,11 +156,11 @@ function encodeFieldToString(field) {
   for (let i = field.length - 1; i >= 0; i--) {
     for (let j = field[i].length - 1; j >= 0; j--) {
       reversed.push(
-          field[i][j]
+        field[i][j],
       );
     }
   }
-  return "=" + reversed.reverse().join('');
+  return '=' + reversed.reverse().join('');
 }
 
 function plainTextToPuyopUrl(plainText) {

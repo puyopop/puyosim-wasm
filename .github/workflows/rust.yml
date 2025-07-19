@@ -12,8 +12,6 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    # Only run if Rust code exists in the repository
-    if: ${{ hashFiles('Cargo.toml') != '' }}
     strategy:
       matrix:
         rust: [stable, beta]  # Test against stable and beta to catch future compatibility issues
@@ -65,8 +63,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    # Only run if Rust code exists in the repository
-    if: ${{ hashFiles('Cargo.toml') != '' }}
 
     steps:
       - name: Checkout code
@@ -112,8 +108,6 @@ jobs:
   security:
     name: Security Audit
     runs-on: ubuntu-latest
-    # Only run if Rust code exists in the repository
-    if: ${{ hashFiles('Cargo.toml') != '' }}
 
     steps:
       - name: Checkout code
