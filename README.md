@@ -56,14 +56,14 @@ iwr https://deno.land/x/install/install.ps1 -useb | iex
 
 ```bash
 # Parse a puyop.com URL
-deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
+deno run --allow-net tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
 
 # Run tests
-deno run --allow-net src/tools/puyop-parser.test.js
+deno run --allow-net tools/puyop-parser.test.js
 
 # Or use the test runner
-chmod +x src/tools/run-tests.sh
-./src/tools/run-tests.sh
+chmod +x tools/run-tests.sh
+./tools/run-tests.sh
 ```
 
 #### Development Commands
@@ -94,7 +94,7 @@ deno coverage coverage --lcov --output=coverage.lcov
 ├── .github/workflows/     # GitHub Actions workflows
 ├── doc/                   # Documentation and guides
 ├── puyosim-core/          # Rust simulation library
-├── src/tools/             # Development tools and utilities
+├── tools/                 # Development tools and utilities
 ├── deno.json             # Deno configuration
 ├── CLAUDE.md             # Development guidance for Claude Code
 └── README.md
@@ -184,7 +184,7 @@ format:
 Example:
 
 ```bash
-deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
+deno run --allow-net tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
 ```
 
 ## Contributing

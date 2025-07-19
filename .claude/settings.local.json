@@ -17,7 +17,8 @@
       "Bash(gh api:*)",
       "Bash(git fetch:*)",
       "WebFetch(domain:docs.anthropic.com)",
-      "Bash(git rebase:*)"
+      "Bash(git rebase:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }
