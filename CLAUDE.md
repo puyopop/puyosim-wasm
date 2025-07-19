@@ -78,32 +78,32 @@ project-root/
 
 ### PuyoP.com Parser
 
-- `src/tools/puyop-parser.js` - Bidirectional converter between puyop.com URLs and plain text field format
-- `src/tools/puyop-parser.test.js` - Comprehensive test script with bidirectional conversion tests
-- `src/tools/run-tests.sh` - Test runner script
+- `tools/puyop-parser.js` - Bidirectional converter between puyop.com URLs and plain text field format
+- `tools/puyop-parser.test.js` - Comprehensive test script with bidirectional conversion tests
+- `tools/run-tests.sh` - Test runner script
 - `doc/plain-text-field-format.md` - Complete specification for plain text field format
 
 **Usage:**
 
 ```bash
 # Convert puyop.com URL to plain text
-deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/1"
+deno run --allow-net tools/puyop-parser.js "https://www.puyop.com/s/1"
 
 # Convert plain text to puyop.com URL
-deno run --allow-net src/tools/puyop-parser.js --to-url "RG\nRB"
+deno run --allow-net tools/puyop-parser.js --to-url "RG\nRB"
 
 # Run comprehensive tests (including bidirectional conversion)
-deno run --allow-net src/tools/puyop-parser.test.js
+deno run --allow-net tools/puyop-parser.test.js
 
 # Run with verbose output
-deno run --allow-net src/tools/puyop-parser.test.js --verbose
+deno run --allow-net tools/puyop-parser.test.js --verbose
 
 # Or use test runner
-./src/tools/run-tests.sh
+./tools/run-tests.sh
 
 # Make executable and run (optional)
-chmod +x src/tools/puyop-parser.js
-./src/tools/puyop-parser.js "https://www.puyop.com/s/1"
+chmod +x tools/puyop-parser.js
+./tools/puyop-parser.js "https://www.puyop.com/s/1"
 ```
 
 **Plain Text Field Format:**
@@ -134,14 +134,14 @@ The parser supports a comprehensive plain text format for representing Puyo Puyo
 echo "BO.TP.
 BGRYBP  
 BBGRYY
-GGRRYP" | deno run --allow-net src/tools/puyop-parser.js --to-url
+GGRRYP" | deno run --allow-net tools/puyop-parser.js --to-url
 
 # With comments
 echo "# This is a GTR setup
 BO.TP.  # Top row
 BGRYBP  # Second row  
 BBGRYY  # Third row
-GGRRYP  # Bottom row" | deno run --allow-net src/tools/puyop-parser.js --to-url
+GGRRYP  # Bottom row" | deno run --allow-net tools/puyop-parser.js --to-url
 ```
 
 See `doc/plain-text-field-format.md` for complete format specification and examples.
@@ -173,7 +173,7 @@ deno check **/*.ts
 deno test --allow-all
 
 # Run specific test file
-deno test --allow-net src/tools/puyop-parser.test.js
+deno test --allow-net tools/puyop-parser.test.js
 
 # Run with coverage
 deno test --allow-all --coverage=coverage

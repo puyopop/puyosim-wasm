@@ -235,9 +235,9 @@ deno lint || { echo "❌ Lint check failed"; exit 1; }
 
 # Run tests
 echo "🧪 Running tests..."
-if [ -f "src/tools/run-tests.sh" ]; then
-    chmod +x src/tools/run-tests.sh
-    ./src/tools/run-tests.sh
+if [ -f "tools/run-tests.sh" ]; then
+    chmod +x tools/run-tests.sh
+    ./tools/run-tests.sh
 else
     deno test --allow-all
 fi
@@ -351,7 +351,7 @@ act --privileged
 - name: Fix permissions
   run: |
     chmod +x ./scripts/*.sh
-    chmod +x ./src/tools/*.sh
+    chmod +x ./tools/*.sh
 ```
 
 ### Debugging Tips

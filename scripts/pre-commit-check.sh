@@ -31,9 +31,9 @@ fi
 
 # Run tests
 echo "🧪 Running tests..."
-if [ -f "src/tools/run-tests.sh" ]; then
-    chmod +x src/tools/run-tests.sh
-    if ! ./src/tools/run-tests.sh; then
+if [ -f "tools/run-tests.sh" ]; then
+    chmod +x tools/run-tests.sh
+    if ! ./tools/run-tests.sh; then
         echo "❌ Tests failed."
         exit 1
     fi
