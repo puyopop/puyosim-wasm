@@ -38,13 +38,6 @@ function base62ToDecimal(char) {
   return index;
 }
 
-function decimalToBase62(num) {
-  if (num < 0 || num >= 62) {
-    throw new Error(`Number out of base62 range: ${num}`);
-  }
-  return BASE62_CHARS[num];
-}
-
 function decodeFieldString(encodedString) {
   if (encodedString.length === 0) {
     return Array(FIELD_HEIGHT).fill().map(() => Array(FIELD_WIDTH).fill(0));
@@ -92,7 +85,7 @@ function decodeFieldString1(encodedString) {
   return field;
 }
 
-function decodeFieldString2(encodedString) {  
+function decodeFieldString2(encodedString) {
   // assert(encodedString[0] === '=');
   const stack = [...encodedString];
   const field = Array(FIELD_HEIGHT).fill().map(() =>
@@ -156,11 +149,11 @@ function encodeFieldToString(field) {
   for (let i = field.length - 1; i >= 0; i--) {
     for (let j = field[i].length - 1; j >= 0; j--) {
       reversed.push(
-          field[i][j]
+        field[i][j],
       );
     }
   }
-  return "=" + reversed.reverse().join('');
+  return '=' + reversed.reverse().join('');
 }
 
 function plainTextToPuyopUrl(plainText) {
