@@ -38,13 +38,6 @@ function base62ToDecimal(char) {
   return index;
 }
 
-function decimalToBase62(num) {
-  if (num < 0 || num >= 62) {
-    throw new Error(`Number out of base62 range: ${num}`);
-  }
-  return BASE62_CHARS[num];
-}
-
 function decodeFieldString(encodedString) {
   if (encodedString.length === 0) {
     return Array(FIELD_HEIGHT).fill().map(() => Array(FIELD_WIDTH).fill(0));
