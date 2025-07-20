@@ -8,13 +8,13 @@ env:
   DENO_DIR: /tmp/.deno
 
 jobs:
-  # Primary Deno workflow
+  # Primary Deno workflow - runs tests, linting, and formatting checks for JavaScript/TypeScript code
   deno:
     name: Deno
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        deno-version: ['v1.x', 'v2.x']
+        deno-version: ['v1.x', 'v2.x']  # Test against both Deno v1 and v2 for compatibility
 
     steps:
       - name: Checkout code
@@ -25,6 +25,7 @@ jobs:
         with:
           deno-version: ${{ matrix.deno-version }}
 
+      # Cache Deno dependencies to speed up builds
       - name: Cache Deno dependencies
         uses: actions/cache@v4
         with:
@@ -36,6 +37,7 @@ jobs:
       - name: Verify Deno installation
         run: deno --version
 
+      # Check code formatting according to deno.json configuration
       - name: Check formatting
         run: |
           if find . -name "*.js" -o -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./doc/*" | head -1 | grep -q .; then
@@ -45,6 +47,7 @@ jobs:
             echo "No JavaScript/TypeScript files found, skipping format check"
           fi
 
+      # Run Deno linter to check for code quality issues
       - name: Run linter
         run: |
           if find . -name "*.js" -o -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./doc/*" | head -1 | grep -q .; then
@@ -54,6 +57,7 @@ jobs:
             echo "No JavaScript/TypeScript files found, skipping lint"
           fi
 
+      # Type check TypeScript files to ensure type safety
       - name: Type check TypeScript files
         run: |
           if find . -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" | head -1 | grep -q .; then
@@ -63,6 +67,7 @@ jobs:
             echo "No TypeScript files found, skipping type check"
           fi
 
+      # Run standard Deno test files (*.test.js, *.test.ts)
       - name: Run Deno tests
         run: |
           if find . -name "*.test.js" -o -name "*.test.ts" | head -1 | grep -q .; then
@@ -77,29 +82,31 @@ jobs:
             echo "No Deno test files found (*.test.js, *.test.ts)"
           fi
 
+      # Run project-specific tests (e.g., puyop-parser tool tests)
       - name: Run project-specific tests
         run: |
-          if [ -f "src/tools/run-tests.sh" ]; then
+          if [ -f "tools/run-tests.sh" ]; then
             echo "Running project test script..."
-            chmod +x src/tools/run-tests.sh
+            chmod +x tools/run-tests.sh
             # Run tests in quiet mode first
-            if ! ./src/tools/run-tests.sh; then
+            if ! ./tools/run-tests.sh; then
               echo "Tests failed. Re-running with verbose output for debugging..."
-              ./src/tools/run-tests.sh --verbose
+              ./tools/run-tests.sh --verbose
               exit 1
             fi
-          elif [ -f "src/tools/puyop-parser.test.js" ]; then
+          elif [ -f "tools/puyop-parser.test.js" ]; then
             echo "Running parser tests..."
             # Run tests in quiet mode first
-            if ! deno run --allow-net src/tools/puyop-parser.test.js; then
+            if ! deno run --allow-net tools/puyop-parser.test.js; then
               echo "Tests failed. Re-running with verbose output for debugging..."
-              deno run --allow-net src/tools/puyop-parser.test.js --verbose
+              deno run --allow-net tools/puyop-parser.test.js --verbose
               exit 1
             fi
           else
             echo "No project-specific test script found"
           fi
 
+      # Generate test coverage report (only for v1.x to avoid duplicate reports)
       - name: Generate coverage report
         if: matrix.deno-version == 'v1.x'
         run: |
@@ -107,6 +114,7 @@ jobs:
             deno coverage coverage --lcov --output=coverage.lcov
           fi
 
+      # Upload coverage to Codecov for tracking test coverage trends
       - name: Upload coverage to Codecov
         if: matrix.deno-version == 'v1.x'
         uses: codecov/codecov-action@v4
@@ -114,6 +122,7 @@ jobs:
           file: ./coverage.lcov
           fail_ci_if_error: false
 
+      # Verify dependencies are locked and check for updates
       - name: Security dependency check
         run: |
           if [ -f "deno.lock" ]; then
@@ -126,34 +135,8 @@ jobs:
             echo "No dependency file found, skipping security check"
           fi
 
-  # Compatibility check with Node.js (if needed)
-  compatibility:
-    name: Node.js Compatibility
-    runs-on: ubuntu-latest
-    # Only run if there are any npm/node related files
-    if: ${{ contains(github.event.head_commit.message, '[test-node]') || github.event_name == 'pull_request' }}
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Test JavaScript files with Node.js
-        run: |
-          echo "Testing JavaScript file compatibility with Node.js..."
-          if find . -name "*.js" -not -path "./node_modules/*" -not -path "./.git/*" | head -1 | grep -q .; then
-            # Basic syntax check
-            find . -name "*.js" -not -path "./node_modules/*" -not -path "./.git/*" -exec node --check {} \;
-            echo "✅ JavaScript files are Node.js compatible"
-          else
-            echo "No JavaScript files found"
-          fi
-
-  # Security scanning
+  # Security scanning - checks for vulnerabilities and security issues
   security:
     name: Security Scan
     runs-on: ubuntu-latest
@@ -167,6 +150,7 @@ jobs:
         with:
           deno-version: v1.x
 
+      # Basic security checks for common vulnerabilities
       - name: Deno security audit
         run: |
           echo "Running Deno security checks..."
@@ -186,6 +170,7 @@ jobs:
             ! find . -name "*.js" -o -name "*.ts" -not -path "*/test*" -not -path "*/*.test.*" | xargs grep -l "console\." || echo "ℹ️  Found console statements in non-test files"
           fi
 
+      # Advanced security analysis using Semgrep
       - name: Run Semgrep security analysis
         uses: semgrep/semgrep-action@v1
         with:

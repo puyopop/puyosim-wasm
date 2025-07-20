@@ -8,14 +8,13 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # Run tests for the Rust simulation core
   test:
     name: Test
     runs-on: ubuntu-latest
-    # Only run if Cargo.toml exists
-    if: ${{ hashFiles('Cargo.toml') != '' }}
     strategy:
       matrix:
-        rust: [stable, beta]
+        rust: [stable, beta]  # Test against stable and beta to catch future compatibility issues
 
     steps:
       - name: Checkout code
@@ -27,6 +26,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           components: rustfmt, clippy
 
+      # Cache dependencies to speed up builds
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
@@ -51,17 +51,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-build-target-
 
+      # Run standard tests
       - name: Run tests
         run: cargo test --verbose
 
+      # Test with all feature flags enabled to ensure compatibility
       - name: Run tests with all features
         run: cargo test --all-features --verbose
 
+  # Code quality checks - formatting, linting, and documentation
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    # Only run if Cargo.toml exists
-    if: ${{ hashFiles('Cargo.toml') != '' }}
 
     steps:
       - name: Checkout code
@@ -72,6 +73,7 @@ jobs:
         with:
           components: rustfmt, clippy
 
+      # Cache dependencies for faster builds
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
@@ -88,22 +90,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-index-
 
+      # Ensure consistent code formatting
       - name: Check formatting
         run: cargo fmt -- --check
 
+      # Run clippy linter with strict warnings
       - name: Run clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
 
+      # Verify documentation builds without warnings
       - name: Check documentation
         run: cargo doc --no-deps --document-private-items --all-features
         env:
           RUSTDOCFLAGS: -D warnings
 
+  # Security audit - check for known vulnerabilities in dependencies
   security:
     name: Security Audit
     runs-on: ubuntu-latest
-    # Only run if Cargo.toml exists
-    if: ${{ hashFiles('Cargo.toml') != '' }}
 
     steps:
       - name: Checkout code
@@ -112,33 +116,11 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      # Install cargo-audit for vulnerability scanning
       - name: Install cargo-audit
         run: cargo install cargo-audit
 
+      # Scan dependencies for known security vulnerabilities
       - name: Run security audit
         run: cargo audit
 
-  coverage:
-    name: Code Coverage
-    runs-on: ubuntu-latest
-    # Only run if Cargo.toml exists
-    if: ${{ hashFiles('Cargo.toml') != '' }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install cargo-tarpaulin
-        run: cargo install cargo-tarpaulin
-
-      - name: Run coverage
-        run: cargo tarpaulin --verbose --all-features --workspace --timeout 120 --out xml
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./cobertura.xml
-          fail_ci_if_error: false

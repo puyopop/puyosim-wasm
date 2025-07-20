@@ -5,7 +5,7 @@
     "lineWidth": 80,
     "indentWidth": 2,
     "include": [
-      "src/",
+      "tools/",
       "**/*.js",
       "**/*.ts"
     ],
@@ -22,7 +22,7 @@
       "tags": ["recommended"]
     },
     "include": [
-      "src/",
+      "tools/",
       "**/*.js",
       "**/*.ts"
     ],
@@ -35,7 +35,7 @@
   },
   "test": {
     "include": [
-      "src/",
+      "tools/",
       "**/*.test.{js,ts}"
     ]
   }

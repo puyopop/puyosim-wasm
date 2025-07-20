@@ -32,7 +32,7 @@ deno fmt --check
 
 # Format specific files or directories
 deno fmt src/
-deno fmt src/tools/puyop-parser.js
+deno fmt tools/puyop-parser.js
 
 # Format and exclude certain files (configured in deno.json)
 deno fmt --exclude=doc/
@@ -84,7 +84,7 @@ deno lint
 
 # Lint specific files or directories
 deno lint src/
-deno lint src/tools/puyop-parser.js
+deno lint tools/puyop-parser.js
 
 # Lint with specific rules (configured in deno.json)
 deno lint --rules-tags=recommended
@@ -137,7 +137,7 @@ deno test
 deno test --allow-all
 
 # Run specific test file
-deno test src/tools/puyop-parser.test.js
+deno test tools/puyop-parser.test.js
 
 # Run tests with coverage
 deno test --allow-all --coverage=coverage
@@ -209,17 +209,17 @@ deno fmt --check && deno lint && deno test --allow-all
 
 ```bash
 # Run the parser directly
-deno run --allow-net src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
+deno run --allow-net tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
 
 # Run parser tests
-deno test --allow-net src/tools/puyop-parser.test.js
+deno test --allow-net tools/puyop-parser.test.js
 
 # Or use the test runner script
-./src/tools/run-tests.sh
+./tools/run-tests.sh
 
 # Make executable and run (optional)
-chmod +x src/tools/puyop-parser.js
-./src/tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
+chmod +x tools/puyop-parser.js
+./tools/puyop-parser.js "https://www.puyop.com/s/?_=000"
 ```
 
 ## GitHub Actions Integration

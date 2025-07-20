@@ -4,7 +4,7 @@ use crate::puyo::Puyo;
 pub struct Field {
     pub width: usize,
     pub height: usize,
-    cells: Vec<Option<Puyo>>, 
+    cells: Vec<Option<Puyo>>,
 }
 
 impl Field {
