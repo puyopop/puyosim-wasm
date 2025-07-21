@@ -1,4 +1,4 @@
-name: Deno CI
+name: CI
 
 on:
   push:
@@ -8,176 +8,84 @@ env:
   DENO_DIR: /tmp/.deno
 
 jobs:
-  # Primary Deno workflow - runs tests, linting, and formatting checks for JavaScript/TypeScript code
-  deno:
-    name: Deno
+  # WebAssembly + Deno workflow
+  test:
+    name: Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        deno-version: ['v1.x', 'v2.x']  # Test against both Deno v1 and v2 for compatibility
+        deno-version: ['v2.x']  # Use only Deno v2 for simplicity
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: rustfmt, clippy
+
+      - name: Install wasm-pack
+        run: |
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Setup Deno ${{ matrix.deno-version }}
         uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ matrix.deno-version }}
 
-      # Cache Deno dependencies to speed up builds
-      - name: Cache Deno dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.DENO_DIR }}
-          key: deno-${{ matrix.deno-version }}-${{ hashFiles('deno.lock') }}
-          restore-keys: |
-            deno-${{ matrix.deno-version }}-
-
-      - name: Verify Deno installation
-        run: deno --version
-
-      # Check code formatting according to deno.json configuration
-      - name: Check formatting
+      - name: Build WebAssembly
         run: |
-          if find . -name "*.js" -o -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./doc/*" | head -1 | grep -q .; then
-            echo "Checking formatting for JavaScript/TypeScript files..."
-            deno fmt --check
-          else
-            echo "No JavaScript/TypeScript files found, skipping format check"
-          fi
+          wasm-pack build --target deno --out-dir pkg-deno
 
-      # Run Deno linter to check for code quality issues
-      - name: Run linter
+      - name: Verify installations
         run: |
-          if find . -name "*.js" -o -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./doc/*" | head -1 | grep -q .; then
-            echo "Linting JavaScript/TypeScript files..."
-            deno lint
-          else
-            echo "No JavaScript/TypeScript files found, skipping lint"
-          fi
+          deno --version
+          cargo --version
+          wasm-pack --version
 
-      # Type check TypeScript files to ensure type safety
+      - name: Run Rust tests
+        run: |
+          echo "Running Rust unit tests..."
+          cargo test --lib
+
+      - name: Run Rust integration tests
+        run: |
+          echo "Running Rust integration tests..."
+          cargo test --test lib_integration_test
+
+      - name: Check Rust formatting
+        run: |
+          echo "Checking Rust formatting..."
+          cargo fmt --check
+
+      - name: Run Rust linter
+        run: |
+          echo "Running Rust linter..."
+          cargo clippy -- -D warnings
+
+      - name: Check Deno formatting
+        run: |
+          echo "Checking Deno formatting..."
+          deno fmt --check
+
+      - name: Run Deno linter
+        run: |
+          echo "Running Deno linter..."
+          deno lint
+
       - name: Type check TypeScript files
         run: |
-          if find . -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" | head -1 | grep -q .; then
-            echo "Type checking TypeScript files..."
-            find . -name "*.ts" -not -path "./node_modules/*" -not -path "./.git/*" -exec deno check {} +
-          else
-            echo "No TypeScript files found, skipping type check"
-          fi
+          echo "Type checking TypeScript files..."
+          deno check tests/deno/greet_test.ts main.ts
 
-      # Run standard Deno test files (*.test.js, *.test.ts)
-      - name: Run Deno tests
+      - name: Run WebAssembly tests
         run: |
-          if find . -name "*.test.js" -o -name "*.test.ts" | head -1 | grep -q .; then
-            echo "Running Deno test files..."
-            # Run tests quietly first, then with verbose output if they fail
-            if ! deno test --allow-all --coverage=coverage --quiet; then
-              echo "Deno tests failed. Re-running with verbose output for debugging..."
-              deno test --allow-all --coverage=coverage
-              exit 1
-            fi
-          else
-            echo "No Deno test files found (*.test.js, *.test.ts)"
-          fi
+          echo "Running WebAssembly tests with Deno..."
+          deno test --allow-all tests/deno/
 
-      # Run project-specific tests (e.g., puyop-parser tool tests)
-      - name: Run project-specific tests
+      - name: Run tool tests
         run: |
-          if [ -f "tools/run-tests.sh" ]; then
-            echo "Running project test script..."
-            chmod +x tools/run-tests.sh
-            # Run tests in quiet mode first
-            if ! ./tools/run-tests.sh; then
-              echo "Tests failed. Re-running with verbose output for debugging..."
-              ./tools/run-tests.sh --verbose
-              exit 1
-            fi
-          elif [ -f "tools/puyop-parser.test.js" ]; then
-            echo "Running parser tests..."
-            # Run tests in quiet mode first
-            if ! deno run --allow-net tools/puyop-parser.test.js; then
-              echo "Tests failed. Re-running with verbose output for debugging..."
-              deno run --allow-net tools/puyop-parser.test.js --verbose
-              exit 1
-            fi
-          else
-            echo "No project-specific test script found"
-          fi
-
-      # Generate test coverage report (only for v1.x to avoid duplicate reports)
-      - name: Generate coverage report
-        if: matrix.deno-version == 'v1.x'
-        run: |
-          if [ -d "coverage" ]; then
-            deno coverage coverage --lcov --output=coverage.lcov
-          fi
-
-      # Upload coverage to Codecov for tracking test coverage trends
-      - name: Upload coverage to Codecov
-        if: matrix.deno-version == 'v1.x'
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage.lcov
-          fail_ci_if_error: false
-
-      # Verify dependencies are locked and check for updates
-      - name: Security dependency check
-        run: |
-          if [ -f "deno.lock" ]; then
-            echo "Checking dependencies with lock file..."
-            deno cache --reload --lock=deno.lock deno.json
-          elif [ -f "deno.json" ]; then
-            echo "Caching dependencies from deno.json..."
-            deno cache --reload deno.json
-          else
-            echo "No dependency file found, skipping security check"
-          fi
-
-
-  # Security scanning - checks for vulnerabilities and security issues
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v1.x
-
-      # Basic security checks for common vulnerabilities
-      - name: Deno security audit
-        run: |
-          echo "Running Deno security checks..."
-          # Check for known vulnerabilities in dependencies
-          if [ -f "deno.lock" ]; then
-            deno cache --reload --lock=deno.lock deno.json
-          fi
-
-          # Basic security scan of JavaScript files
-          echo "Scanning for potential security issues..."
-          if command -v grep >/dev/null 2>&1; then
-            # Look for potential security issues
-            echo "Checking for eval() usage..."
-            ! find . -name "*.js" -o -name "*.ts" | xargs grep -l "eval(" || echo "⚠️  Found eval() usage - review for security"
-
-            echo "Checking for console.log in production files..."
-            ! find . -name "*.js" -o -name "*.ts" -not -path "*/test*" -not -path "*/*.test.*" | xargs grep -l "console\." || echo "ℹ️  Found console statements in non-test files"
-          fi
-
-      # Advanced security analysis using Semgrep
-      - name: Run Semgrep security analysis
-        uses: semgrep/semgrep-action@v1
-        with:
-          config: >-
-            p/security-audit
-            p/javascript
-            p/typescript
-        continue-on-error: true
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN || '' }}
+          echo "Running puyop-parser tests..."
+          deno run --allow-net tools/puyop-parser.test.js

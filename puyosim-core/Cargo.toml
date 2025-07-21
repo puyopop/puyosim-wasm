@@ -1,8 +1,0 @@
-[package]
-name = "puyosim-core"
-version = "0.1.0"
-edition = "2021"
-license = "MIT"
-description = "Core library for simulating Puyo Puyo fields"
-
-[dependencies]

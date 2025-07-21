@@ -20,7 +20,13 @@
       "Bash(git rebase:*)",
       "Bash(ls:*)",
       "Bash(find:*)",
-      "Bash(gh workflow view:*)"
+      "Bash(gh workflow view:*)",
+      "Bash(cargo test:*)",
+      "Bash(deno test:*)",
+      "Bash(act:*)",
+      "Bash(deno cache:*)",
+      "Bash(wasm-pack build:*)",
+      "Bash(cargo fmt:*)"
     ],
     "deny": []
   }
